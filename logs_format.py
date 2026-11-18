@@ -46,8 +46,14 @@ def format_data():
                     print(error)
                     sensor_values[m.group("key").lower()+"-values"] = []
                                    
-def find_max_value(sensor):
-    pass
+def find_max_value(sensor,*sensor_values):
+    try:
+         max_value = max(sensor_values)
+    except Exception as e:  # noqa: BLE001
+        print(e)
+        return False
+    return max_value
+    
 def find_min_value(sensor):
     pass
 def control_float(sensor_value):
