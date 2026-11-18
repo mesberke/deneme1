@@ -1,5 +1,7 @@
-import re 
+import re
 
+corrupted_data = 0 
+invalid_data = 0
 
 logs = """
 [2026-11-14 10:15:03] SENSOR=depth SENSOR_VALUE=2.35 UNIT=m
@@ -35,13 +37,15 @@ def format_data():
 
         if  (pat is not None ) & (date is not None)  & (time is not None):
             for m in re.finditer(pat, data, re.IGNORECASE):
+                if m.group("key").lower() == "depth":  # noqa: SIM102
+                    if  f_value := control_depth(m.group("value")) :
+                        continue
                 try:
-                    sensor_values[m.group("key").lower()+"-values"].append(m.group("value"))
+                    sensor_values[m.group("key").lower()+"-values"].append(f_value)
                 except KeyError as error:
                     print(error)
                     sensor_values[m.group("key").lower()+"-values"] = []
-    print(sensor_values)
-    
+                                   
 def find_max_value(sensor):
     pass
 def find_min_value(sensor):
@@ -49,7 +53,16 @@ def find_min_value(sensor):
 def control_float(sensor_value):
     pass
 def control_depth(depth_value):
-    pass
+    global corrupted_data,invalid_data
+        
+    f_depth = control_float(depth_value)
+    if not f_depth:
+        corrupted_data += 1
+        return False
+    if f_depth < 0:
+        invalid_data += 1
+        return False
+    return f_depth
 def print_formatted_logs():
     pass
 
