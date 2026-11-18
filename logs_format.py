@@ -51,10 +51,15 @@ def find_max_value(sensor):
 def find_min_value(sensor):
     pass
 def control_float(sensor_value):
-    pass
+    try: 
+        f_value = float(sensor_value)
+    except ValueError as error :
+        print(error)
+        return False
+    return f_value
 def control_depth(depth_value):
     global corrupted_data,invalid_data
-        
+
     f_depth = control_float(depth_value)
     if not f_depth:
         corrupted_data += 1
