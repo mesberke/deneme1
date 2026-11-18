@@ -2,7 +2,8 @@ import re
 
 corrupted_data = 0 
 invalid_data = 0
-
+sensor_values = {}
+id = 0
 logs = """
 [2026-11-14 10:15:03] SENSOR=depth SENSOR_VALUE=2.35 UNIT=m
 [2026-11-14 10:15:04] SENSOR=speed SENSOR_VALUE=1.80 UNIT=m/s
@@ -45,7 +46,8 @@ def format_data():
                 except KeyError as error:
                     print(error)
                     sensor_values[m.group("key").lower()+"-values"] = []
-                                   
+
+
 def find_max_value(sensor,*sensor_values):
     try:
          max_value = max(sensor_values)
@@ -54,8 +56,14 @@ def find_max_value(sensor,*sensor_values):
         return False
     return max_value
     
-def find_min_value(sensor):
-    pass
+def find_min_value(sensor,*sensor_values):
+    try:
+        min_value = max(sensor_values)
+    except Exception as e:  # noqa: BLE001
+        print(e)
+        return False
+    return min_value
+        
 def control_float(sensor_value):
     try: 
         f_value = float(sensor_value)
