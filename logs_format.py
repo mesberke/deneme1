@@ -3,17 +3,16 @@ import re
 corrupted_data = 0 
 invalid_data = 0
 sensor_values = {}
-id = 0
 logs = """
-[2026-11-14 10:15:03] SENSOR=depth SENSOR_VALUE=2.35 UNIT=m
-[2026-11-14 10:15:04] SENSOR=speed SENSOR_VALUE=1.80 UNIT=m/s
-[2026-11-14 10:15:05] SENSOR=depth SENSOR_VALUE=2.41 UNIT=m
-[2026-11-14 10:15:06] SENSOR=temp SENSOR_VALUE=err UNIT=C
-[2026-11-14 10:15:07] SENSOR=speed SENSOR_VALUE=2.10 UNIT=m/s
-[2026-13-14 10:15:08] SENSOR=depth SENSOR_VALUE=-1.00 UNIT=m
+[2026-11-14 10:15:03] SENSOR=depth VALUE=2.35 UNIT=m
+[2026-11-14 10:15:04] SENSOR=speed VALUE=1.80 UNIT=m/s
+[2026-11-14 10:15:05] SENSOR=depth VALUE=2.41 UNIT=m
+[2026-11-14 10:15:06] SENSOR=temp VALUE=err UNIT=C
+[2026-11-14 10:15:07] SENSOR=speed VALUE=2.10 UNIT=m/s
+[2026-13-14 10:15:08] SENSOR=depth VALUE=-1.00 UNIT=m
 [2026-11-14 10:15:09] garbage line here
 
-[2026-11-14 10:15:10] SENSOR=temp SENSOR_VALUE=18.5 UNIT=C
+[2026-11-14 10:15:10] SENSOR=temp VALUE=18.5 UNIT=C
 """
 #İstenenler: Görev 1
 #logs metnini satırlara ayır, boş satırları atla.
@@ -30,27 +29,54 @@ def main():
     format_data()
 def format_data():
     split_logs = re.findall(r".+",logs,re.MULTILINE)
-    sensor_values = {}
+    
     for index,data in enumerate(split_logs):
-        pat = r"(?P<key>unit|value|sensor)\s*[:=]\s*(?P<value>-?\w+(?:\.\w+)?)"
+        sensor = re.search(r"sensor=(\S+)",data,re.IGNORECASE)
+        value = re.search(r"value=(\S+)",data,re.IGNORECASE)
+        unit = re.search(r"unit=(\S+)",data,re.IGNORECASE)
         date = re.search(r"(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})",data,re.IGNORECASE)
-        time = re.search(r"(?P<hour>\d{4})-(?P<minute>\d{2})-(?P<seconds>\d{2})",data,re.IGNORECASE)
+        time = re.search(r"(?P<hour>\d{2}):(?P<minute>\d{2}):(?P<seconds>\d{2})",data,re.IGNORECASE)
+        try :
+            dict_value = {"sensor" : sensor.group(1),"value" : value.group(1),"unit" : unit.group(1),"date" : date.group(),"time" : time.group()}
+        except AttributeError as err:
+            print(err)
+            continue
+        if not (value := control_float(sensor_value=value.group(1))):
+            continue
+        
+        deger_ata(dict_value)
+        
+            
+    print(sorted(sensor_values))
+    #print(find_max_value(sensor="TEMP"),sensor_values)
+    #print(find_min_value(sensor="TEMP"),sensor_values)
+def deger_ata(data):
+    global sensor_values,id
+    
+    try:
+        
+        sensor_values[data["sensor"]]["value"].append(data["value"])
+        sensor_values[data["sensor"]]["unit"].append(data["unit"])
+        sensor_values[data["sensor"]]["date"].append(data["date"])
+        sensor_values[data["sensor"]]["time"].append(data["time"])
+    except KeyError as error :
+        print(error)
+        if sensor_values.get(data["sensor"]) is None:
+            sensor_values[data["sensor"]] = {}
+        sensor_values[data["sensor"]]= {
+                                    "value" : [],
+                                    "unit" : [],
+                                    "date" : [],
+                                    "time" : []
+                                }
+        deger_ata(data)
+        
+    
 
-        if  (pat is not None ) & (date is not None)  & (time is not None):
-            for m in re.finditer(pat, data, re.IGNORECASE):
-                if m.group("key").lower() == "depth":  # noqa: SIM102
-                    if  f_value := control_depth(m.group("value")) :
-                        continue
-                try:
-                    sensor_values[m.group("key").lower()+"-values"].append(f_value)
-                except KeyError as error:
-                    print(error)
-                    sensor_values[m.group("key").lower()+"-values"] = []
-
-
+    
 def find_max_value(sensor,*sensor_values):
     try:
-         max_value = max(sensor_values)
+        max_value = max(sensor_values[sensor+"-values"])
     except Exception as e:  # noqa: BLE001
         print(e)
         return False
