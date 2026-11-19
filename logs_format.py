@@ -25,9 +25,9 @@ logs = """
 # ilk ve son geçerli kayıt arasındaki süre (saniye) (datetime ile), ve ortalaması en yüksek olan sensör.
 #Beklenen sonuçlar (doğrulama için): 1 bozuk satır, 2 geçersiz değer, 5 geçerli kayıt, süre 7 saniye, en yüksek ortalama temp.
 
-def main():
-    format_data()
-def format_data():
+def main(): # c deki main mantığı ile aynı çalışır ana fonkdur
+    load_data()
+def load_data():# veriyi ayrıştırır ve assign value fonk ile dict(sensor values) atar
     split_logs = re.findall(r".+",logs,re.MULTILINE)
     
     for index,data in enumerate(split_logs):
@@ -44,14 +44,12 @@ def format_data():
         if not (value := control_float(sensor_value=value.group(1))):
             continue
         
-        deger_ata(dict_value)
+        assign_value(dict_value)
         
             
-    print(sorted(sensor_values))
-    #print(find_max_value(sensor="TEMP"),sensor_values)
-    #print(find_min_value(sensor="TEMP"),sensor_values)
-def deger_ata(data):
-    global sensor_values,id
+    print(sensor_values)
+def assign_value(data):
+    global sensor_values
     
     try:
         
@@ -64,17 +62,15 @@ def deger_ata(data):
         if sensor_values.get(data["sensor"]) is None:
             sensor_values[data["sensor"]] = {}
         sensor_values[data["sensor"]]= {
-                                    "value" : [],
-                                    "unit" : [],
-                                    "date" : [],
-                                    "time" : []
-                                }
-        deger_ata(data)
+                        "value" : [],
+                        "unit" : [],
+                        "date" : [],
+                        "time" : []
+                    }
+        assign_value(data)
         
     
-
-    
-def find_max_value(sensor,*sensor_values):
+def find_max_value(sensor,*sensor_values):# belirtilen sensore göre max degeri bulur
     try:
         max_value = max(sensor_values[sensor+"-values"])
     except Exception as e:  # noqa: BLE001
@@ -82,7 +78,7 @@ def find_max_value(sensor,*sensor_values):
         return False
     return max_value
     
-def find_min_value(sensor,*sensor_values):
+def find_min_value(sensor,*sensor_values):# belirtilen sensore göre min degeri bulur
     try:
         min_value = max(sensor_values)
     except Exception as e:  # noqa: BLE001
@@ -90,14 +86,14 @@ def find_min_value(sensor,*sensor_values):
         return False
     return min_value
         
-def control_float(sensor_value):
+def control_float(sensor_value): # verinin floata çevrilip çevrilmediğini kontrol eder float ise degeri degil ise false dondurur
     try: 
         f_value = float(sensor_value)
     except ValueError as error :
         print(error)
         return False
     return f_value
-def control_depth(depth_value):
+def control_depth(depth_value): # verideki depth degerini kontrol eder 0 dan kucukse false dondurur
     global corrupted_data,invalid_data
 
     f_depth = control_float(depth_value)
@@ -108,7 +104,7 @@ def control_depth(depth_value):
         invalid_data += 1
         return False
     return f_depth
-def print_formatted_logs():
+def print_formatted_logs(): # gorevde istenen sekilde logların terminale yazdirilmasını saglar
     pass
 
 main()
