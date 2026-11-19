@@ -90,18 +90,28 @@ def assign_value(data):  # sensor_values degiskenine deger atar
     return
 
 
-def find_max_value(sensor, *sensor_values):  # belirtilen sensore göre max degeri bulur
+def find_max_value(sensor):# belirtilen sensore göre max degeri bulur
+    set_values = set()
+    max_value = 0
+    for data in sensor_values.values(): 
+        if data["sensor"] == sensor :
+            set_values.add(data["value"]) 
     try:
-        max_value = max(sensor_values[sensor + "-values"])
+        max_value = max(set_values)
     except Exception as e:  # noqa: BLE001
         print(e)
         return False
     return max_value
 
 
-def find_min_value(sensor, *sensor_values):  # belirtilen sensore göre min degeri bulur
+def find_min_value(sensor):
+    set_values = set()
+    min_value = 0
+    for data in sensor_values.values(): 
+        if data["sensor"] == sensor:
+            set_values.add(data["value"])   # belirtilen sensore göre min degeri bulur
     try:
-        min_value = max(sensor_values)
+        min_value = min(set_values)
     except Exception as e:  # noqa: BLE001
         print(e)
         return False
@@ -135,9 +145,13 @@ def control_depth(
 
 def print_formatted_logs(): # gorevde istenen sekilde logların terminale yazdirilmasını saglar
     print(f"{'Sensor':<10} {'value':<10} {'date':<14} {'time':<8}")
-
+    set_sensors = set()
     for time,data in sensor_values.items():
         print(f"{data["sensor"] :<10} {data["value"]:<8} {data["date"]:<14} {time:<8}")
-
+        set_sensors.add(data["sensor"])
+    if set_sensors is None :
+        return
+    for sensor in set_sensors:
+        print(f"{sensor} icin max value = {find_max_value(sensor)} - {sensor} icin min value  = {find_min_value(sensor)}")
 
 main()
