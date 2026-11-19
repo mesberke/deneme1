@@ -55,7 +55,7 @@ def load_data():  # veriyi ayrıştırır ve assign value fonk ile dict(sensor v
         if not (value := control_float(sensor_value=value.group(1))):
             continue
 
-        if sensor.group(1).lower() == "depth":  # noqa: SIM102
+        if sensor.group(1).lower == "depth":  # noqa: SIM102
             if not control_depth(value):
                 continue
 
