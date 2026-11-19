@@ -66,24 +66,30 @@ def load_data():  # veriyi ayrıştırır ve assign value fonk ile dict(sensor v
 
 
 def assign_value(data):  # sensor_values degiskenine deger atar
-    global sensor_values
-
+    global sensor_values  # noqa: PLW0602
+    if sensor_values.get(data["time"]) is None:
+        sensor_values[data["time"]] = {}
+    else :
+        print("ayni zamana ait  2 veri geldi supheli tekrar inceleyin (ilk gelen veri alindi)")
+        return
     try:
-        sensor_values[data["sensor"]]["value"].append(data["value"])
-        sensor_values[data["sensor"]]["unit"].append(data["unit"])
-        sensor_values[data["sensor"]]["date"].append(data["date"])
-        sensor_values[data["sensor"]]["time"].append(data["time"])
-    except KeyError as error:
-        print(error)
-        if sensor_values.get(data["sensor"]) is None:
-            sensor_values[data["sensor"]] = {}
-        sensor_values[data["sensor"]] = {
-            "value": [],
-            "unit": [],
-            "date": [],
-            "time": [],
+        sensor_values[data["time"]]["value"] = data["value"]
+        sensor_values[data["time"]]["unit"] = data["unit"]
+        sensor_values[data["time"]]["date"] = data["date"]
+        sensor_values[data["time"]]["sensor"] = data["sensor"]
+    except KeyError :
+        sensor_values[data["time"]] = {
+            "value": 0,
+            "unit": 0 ,
+            "date": 0,
+            "sensor": 0,
         }
-        assign_value(data)
+        sensor_values[data["time"]]["value"] = data["value"]
+        sensor_values[data["time"]]["unit"] = data["unit"]
+        sensor_values[data["time"]]["date"] = data["date"]
+        sensor_values[data["time"]]["sensor"] = data["sensor"]
+        return
+    return
 
 
 def find_max_value(sensor, *sensor_values):  # belirtilen sensore göre max degeri bulur
