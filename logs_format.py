@@ -32,7 +32,7 @@ def main():  # c deki main mantığı ile aynı çalışır ana fonkdur
 
 def load_data():  # veriyi ayrıştırır ve assign value fonk ile dict(sensor values) atar
     split_logs = re.findall(r".+", logs, re.MULTILINE)
-
+    global corrupted_data
     for index, data in enumerate(split_logs):
         sensor = re.search(r"sensor=(\S+)", data, re.IGNORECASE)
         value = re.search(r"value=(\S+)", data, re.IGNORECASE)
@@ -50,6 +50,7 @@ def load_data():  # veriyi ayrıştırır ve assign value fonk ile dict(sensor v
             }
         except AttributeError as err:
             print(err)
+            corrupted_data +=1
             continue
 
         if not (value := control_float(sensor_value=value.group(1))):
@@ -118,20 +119,18 @@ def find_min_value(sensor):
     return min_value
 
 
-def control_float(
-    sensor_value,
-):  # verinin floata çevrilip çevrilmediğini kontrol eder float ise degeri degil ise false dondurur
+def control_float(sensor_value,): 
+    global invalid_data # verinin floata çevrilip çevrilmediğini kontrol eder float ise degeri degil ise false dondurur
     try:
         f_value = float(sensor_value)
     except ValueError as error:
         print(error)
+        invalid_data +=1
         return False
     return f_value
 
 
-def control_depth(
-    depth_value,
-):  # verideki depth degerini kontrol eder 0 dan kucukse false dondurur
+def control_depth(depth_value):  # verideki depth degerini kontrol eder 0 dan kucukse false dondurur
     global corrupted_data, invalid_data
 
     if not depth_value:
@@ -153,5 +152,5 @@ def print_formatted_logs(): # gorevde istenen sekilde logların terminale yazdir
         return
     for sensor in set_sensors:
         print(f"{sensor} icin max value = {find_max_value(sensor)} - {sensor} icin min value  = {find_min_value(sensor)}")
-
+    print(f"Corrupted data : {corrupted_data} - Invalid data  : {invalid_data}")
 main()
