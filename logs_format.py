@@ -48,7 +48,7 @@ def load_data():# veriyi ayrıştırır ve assign value fonk ile dict(sensor val
         
             
     print(sensor_values)
-def assign_value(data):
+def assign_value(data): #sensor_values degiskenine deger atar 
     global sensor_values
     
     try:
