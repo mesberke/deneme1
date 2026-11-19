@@ -1,3 +1,4 @@
+from datetime import datetime
 import re
 
 corrupted_data = 0
@@ -141,6 +142,15 @@ def control_depth(depth_value):  # verideki depth degerini kontrol eder 0 dan ku
         return False
     return depth_value
 
+def sum_time():
+    dt_times = []
+    for time in sensor_values.keys():
+        try:
+            dt_time = datetime.strptime(time,"%H:%M:%S")
+            dt_times.append(dt_time)
+        except Exception as e:
+            print(e)
+    print(f"toplam zaman : {max(dt_times) - min(dt_times)}")
 def mean_values(sensor):
     count = 0
     values = 0
@@ -163,5 +173,6 @@ def print_formatted_logs(): # gorevde istenen sekilde logların terminale yazdir
         print(f"{sensor} icin max value = {find_max_value(sensor)} - {sensor} icin min value  = {find_min_value(sensor)} {sensor} icin ort {mean_values(sensor):.2f} ")
        
     print(f"Corrupted data : {corrupted_data} - Invalid data  : {invalid_data}")
+    sum_time()
     
 main()
