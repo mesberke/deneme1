@@ -141,7 +141,16 @@ def control_depth(depth_value):  # verideki depth degerini kontrol eder 0 dan ku
         return False
     return depth_value
 
-
+def mean_values(sensor):
+    count = 0
+    values = 0
+    for data in sensor_values.values():
+        if data["sensor"] == sensor:
+            values += float(data["value"])
+            count +=1
+    if count == 0:
+        return False
+    return (values / count)      
 def print_formatted_logs(): # gorevde istenen sekilde logların terminale yazdirilmasını saglar
     print(f"{'Sensor':<10} {'value':<10} {'date':<14} {'time':<8}")
     set_sensors = set()
@@ -151,6 +160,8 @@ def print_formatted_logs(): # gorevde istenen sekilde logların terminale yazdir
     if set_sensors is None :
         return
     for sensor in set_sensors:
-        print(f"{sensor} icin max value = {find_max_value(sensor)} - {sensor} icin min value  = {find_min_value(sensor)}")
+        print(f"{sensor} icin max value = {find_max_value(sensor)} - {sensor} icin min value  = {find_min_value(sensor)} {sensor} icin ort {mean_values(sensor):.2f} ")
+       
     print(f"Corrupted data : {corrupted_data} - Invalid data  : {invalid_data}")
+    
 main()
