@@ -55,10 +55,9 @@ def load_data():  # veriyi ayrıştırır ve assign value fonk ile dict(sensor v
         if not (value := control_float(sensor_value=value.group(1))):
             continue
 
-        if sensor.group(1).lower == "depth":  # noqa: SIM102
+        if sensor.group(1).lower() == "depth":  # noqa: SIM102
             if not control_depth(value):
                 continue
-
     
         assign_value(dict_value)
     print(sensor_values)
@@ -135,10 +134,10 @@ def control_depth(
 
 
 def print_formatted_logs(): # gorevde istenen sekilde logların terminale yazdirilmasını saglar
-    print(f"{'Sensor':<10} {'Max':>8} {'Min':>8} {'Mean':>8}")
-    print(sensor_values.keys())
-    for sensor,data in sensor_values.items():
-        print(f"{sensor:<8} {data["value"]:6 } {data["date"]:<6} {data["time"]:<6}")
+    print(f"{'Sensor':<10} {'value':<10} {'date':<14} {'time':<8}")
+
+    for time,data in sensor_values.items():
+        print(f"{data["sensor"] :<10} {data["value"]:<8} {data["date"]:<14} {time:<8}")
 
 
 main()
