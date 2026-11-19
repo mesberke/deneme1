@@ -61,9 +61,8 @@ def load_data():  # veriyi ayrıştırır ve assign value fonk ile dict(sensor v
 
     
         assign_value(dict_value)
-
     print(sensor_values)
-
+    print_formatted_logs()
 
 def assign_value(data):  # sensor_values degiskenine deger atar
     global sensor_values
@@ -129,8 +128,11 @@ def control_depth(
     return depth_value
 
 
-def print_formatted_logs():  # gorevde istenen sekilde logların terminale yazdirilmasını saglar
-    pass
+def print_formatted_logs(): # gorevde istenen sekilde logların terminale yazdirilmasını saglar
+    print(f"{'Sensor':<10} {'Max':>8} {'Min':>8} {'Mean':>8}")
+    print(sensor_values.keys())
+    for sensor,data in sensor_values.items():
+        print(f"{sensor:<8} {data["value"]:6 } {data["date"]:<6} {data["time"]:<6}")
 
 
 main()
